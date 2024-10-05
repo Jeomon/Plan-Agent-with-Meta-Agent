@@ -23,7 +23,7 @@ class PlanAgent(BaseAgent):
         self.llm=llm
 
     def create_plan(self,state:PlanState):
-        system_prompt=read_markdown_file('./src/agent/plan/prompt/plan.md')
+        system_prompt=read_markdown_file('./src/agent/plan/prompt/simple_plan.md')
         llm_response=self.llm.invoke([SystemMessage(system_prompt),HumanMessage(state.get('input'))])
         plan=plan_to_list(llm_response.content)
         if self.verbose:

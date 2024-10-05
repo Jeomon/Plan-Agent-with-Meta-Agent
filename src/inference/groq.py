@@ -1,8 +1,9 @@
-from requests import post,get,RequestException,HTTPError,ConnectionError
+from requests import RequestException,HTTPError,ConnectionError
 from tenacity import retry,stop_after_attempt,retry_if_exception_type
 from src.message import AIMessage,BaseMessage
 from src.inference import BaseInference
 from typing import Generator
+from httpx import Client
 from json import loads
 
 class ChatGroq(BaseInference):
@@ -24,7 +25,8 @@ class ChatGroq(BaseInference):
                 "type": "json_object"
             }
         try:
-            response=post(url=url,json=payload,headers=headers)
+            with Client() as client:
+                response=client.post(url=url,json=payload,headers=headers,timeout=None)
             response.raise_for_status()
             json_object=response.json()
             # print(json_object)
@@ -60,7 +62,8 @@ class ChatGroq(BaseInference):
                 "type": "json_object"
             }
         try:
-            response=post(url=url,json=payload,headers=headers)
+            with Client() as client:
+                response=client.post(url=url,json=payload,headers=headers)
             response.raise_for_status()
             chunks=response.iter_lines(decode_unicode=True)
             for chunk in chunks:
@@ -79,15 +82,15 @@ class ChatGroq(BaseInference):
         url='https://api.groq.com/openai/v1/models'
         self.headers.update({'Authorization': f'Bearer {self.api_key}'})
         headers=self.headers
-        response=get(url=url,headers=headers)
+        with Client() as client:
+            response=client.get(url=url,headers=headers)
         response.raise_for_status()
         models=response.json()
         return [model['id'] for model in models['data'] if model['active']]
-
+    
 class AudioGroq(BaseInference):
-    def invoke(self,file:str='', language:str='en', json:bool=False)->AIMessage:
-        self.headers.update({'Authorization': f'Bearer {self.api_key}'})
-        headers=self.headers
+    def invoke(self,file_path:str='', language:str='en', json:bool=False)->AIMessage:
+        headers={'Authorization': f'Bearer {self.api_key}'}
         temperature=self.temperature
         url=self.base_url or "https://api.groq.com/openai/v1/audio/transcriptions"
         payload={
@@ -96,7 +99,7 @@ class AudioGroq(BaseInference):
             "language": language
         }
         files={
-            'file': self.__read_audio(file)
+            'file': self.read_audio(file_path)
         }
         if json:
             payload["response_format"]={
@@ -107,12 +110,15 @@ class AudioGroq(BaseInference):
                 "type":"text"
             }
         try:
-            response=post(url=url,json=payload,files=files,headers=headers)
-            response.raise_for_status()
+            with Client() as client:
+                response=client.post(url=url,json=payload,files=files,headers=headers,timeout=None)
+            json_object=response.json()
+            if json_object.get('error'):
+                raise Exception(json_object['error']['message'])
             if json:
-                content=loads(response.text)['text']
+                content=loads(json_object['text'])
             else:
-                content=response.text
+                content=json_object['text']
             return AIMessage(content)
         except HTTPError as err:
             err_object=loads(err.response.text)
@@ -121,8 +127,8 @@ class AudioGroq(BaseInference):
             print(err)
         exit()
     
-    def __read_audio(file_name:str):
-        with open(file_name,'rb') as f:
+    def read_audio(self,file_path:str):
+        with open(file_path,'rb') as f:
             audio_data=f.read()
         return audio_data
     
@@ -130,7 +136,8 @@ class AudioGroq(BaseInference):
         url='https://api.groq.com/openai/v1/models'
         self.headers.update({'Authorization': f'Bearer {self.api_key}'})
         headers=self.headers
-        response=get(url=url,headers=headers)
+        with Client() as client:
+            response=client.get(url=url,headers=headers)
         response.raise_for_status()
         models=response.json()
         return [model['id'] for model in models['data'] if model['active']]
