@@ -64,45 +64,45 @@ python app.py
 #### Example 1: Time right now
 
 ```plaintext
-Enter a query: what is the time now
+Enter a query: What is the time now in the system
 Entering Plan Agent
 Plan:
-1. Check the current time on a device or clock.
+1. Retrieve the current system time.
 Pending Tasks:
-1. Check the current time on a device or clock.
+1. Retrieve the current system time.
 Completed Tasks:
 
-Entering Meta Agent
-Agent Name: Time Checker Agent
-Description: This agent is responsible for checking the current time on a device or clock.
-Tasks: ["Check the device's clock or a nearby clock for the current time."]
-Tool: {'Tool Name': 'Device Clock Tool', 'Tool Description': "A tool that allows the agent to access the device's clock to retrieve the current time."}
-Entering Time Checker Agent
-Thought: Since the task is to check the current time, I need to use a tool that can interact with the user to ask for the current time or retrieve it from the system. However, I don't have a tool that can directly retrieve the current time from the system. I will request a new tool to be created that can retrieve the current time.
+Agent Name: System Time Agent
+Description: This agent is responsible for retrieving the current system time.
+Tasks: ['Access the system clock to retrieve the current time.']
+Tool: {'Tool Name': 'Terminal Tool', 'Tool Description': 'A tool that allows the agent to execute terminal commands to access the system clock.'}
+Entering System Time Agent
+Thought: Since the task is to retrieve the current system time, I need to assess the available tools in the tool box. However, upon reviewing the tool box, I realize that there is no tool available to directly retrieve the system time. Therefore, I will request the creation of a new tool to accomplish this task.
 Entering Tool Agent
-Query: Please create a new tool called 'Time Checker Tool' that can retrieve the current time from the system. This tool should be able to get the current time in hours and minutes.
-Time Checker Tool has been saved to experimental.py successfully.
-Tool Name: Time Checker Tool
-Tool Input: {'properties': {'timezone': {'description': 'The timezone to get the current time from.', 'example': ['UTC'], 'title': 'Timezone', 'type': 'string'}}, 'required': ['timezone'], 'type': 'object'}
+Query: Create a new tool called 'System Time Tool' that can retrieve the current system time. This tool should be able to access the system clock and provide the current time in a readable format.
+System Time Tool has been saved to experimental.py successfully.
+Tool Name: System Time Tool
+Tool Input: {'properties': {'format': {'description': 'The format of the time', 'example': ['%Y-%m-%d %H:%M:%S'], 'title': 'Format', 'type': 'string'}}, 'required': ['format'], 'type': 'object'}
  Tool has been generated successfully. Now the tool is available in the tool box and ready for use.
-Thought: Now that the Time Checker Tool is available in the tool box, I can use it to retrieve the current time. Since the user is using Windows, I will use the 'UTC' timezone as the input to get the current time in a standard format.
-Action Name: Time Checker Tool
+Thought: Now that the 'System Time Tool' is available in the tool box, I can use it to retrieve the current system time. I will specify the format as '%Y-%m-%d %H:%M:%S' to get the time in a readable format.
+Action Name: System Time Tool
 Action Input: {
-  "timezone": "UTC"
+  "format": "%Y-%m-%d %H:%M:%S"
 }
-Observation: Current time in UTC: 17:26
-Thought: Now that I have the current time in UTC, I can provide the final answer to the user. Since the user asked for the current time, I will present the time in a clear and readable format.
-Answer: The current time is **17:26** (UTC).
-Final Answer: The current time is **17:26** (UTC).
+Observation: 2024-10-14 20:22:51
+Thought: Now that I have retrieved the current system time using the 'System Time Tool', I can provide the final answer to the user.
+Answer: The current system time is **2024-10-14 20:22:51**.
+Final Answer: The current system time is **2024-10-14 20:22:51**.
 Current Task:
-Check the current time on a device or clock.
+Retrieve the current system time.
 Task Response:
-Final Answer: The current time is **17:26** (UTC).
+Final Answer: The current system time is **2024-10-14 20:22:51**.
 Pending Tasks:
 
 Completed Tasks:
-1. Check the current time on a device or clock.
-The current time is **17:26** (UTC).
+1. Retrieve the current system time.
+
+The current system time is **2024-10-14 20:22:51**.
 ```
 
 ## Contact

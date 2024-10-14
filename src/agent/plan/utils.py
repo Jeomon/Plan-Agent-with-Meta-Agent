@@ -1,10 +1,24 @@
 import re
 
-def plan_to_list(plan: str) -> list:
-    # Use regex to find each numbered task (starting with digits followed by a period)
-    tasks = re.findall(r'\d+\.\s(.*?)(?=\n\d+\.|\Z)', plan, re.DOTALL)
-    # Strip any extra spaces from each task and return the list
-    return [task.strip() for task in tasks]
+def extract_plan(response):
+    extracted_data = {}
+    # Check if it's Option 1 (gathering information)
+    option1_match = re.search(r'<option>\s*<question>(.*?)</question>\s*<answer>(.*?)</answer>\s*<route>(.*?)</route>\s*</option>', response, re.DOTALL)
+    if option1_match:
+        extracted_data['Question'] = option1_match.group(1).strip()
+        extracted_data['Answer'] = option1_match.group(2).strip()
+        extracted_data['Route'] = option1_match.group(3).strip()
+        return extracted_data
+
+    # Check if it's Option 2 (providing the final plan)
+    option2_match = re.search(r'<option>\s*<plan>(.*?)</plan>\s*<route>(.*?)</route>\s*</option>', response, re.DOTALL)
+    if option2_match:
+        # Extract each task from the plan
+        plan_content = option2_match.group(1).strip()
+        tasks = re.findall(r'(\d+)\.\s*(.*)', plan_content)
+        extracted_data['Plan'] = [task[1].strip() for task in tasks]
+        extracted_data['Route'] = option2_match.group(2).strip()
+        return extracted_data
 
 def extract_llm_response(xml_response: str) -> dict:
     # Initialize the result dictionary
@@ -65,15 +79,3 @@ def read_markdown_file(file_path: str) -> str:
     with open(file_path, 'r',encoding='utf-8') as f:
         markdown_content = f.read()
     return markdown_content
-
-def extract_task(text: str) -> str:
-    # Regular expression to match a single task starting with a number followed by a dot and the task description
-    task_regex = re.compile(r'\d+\.\s*(.*)', re.DOTALL)
-    
-    # Extract the first match
-    task_match = task_regex.search(text)
-    
-    # If a match is found, return the task statement
-    if task_match:
-        return task_match.group(1).strip()
-    return None

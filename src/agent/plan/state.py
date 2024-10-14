@@ -7,6 +7,8 @@ def subtract(l1: list[str], l2: list[str]) -> list[str]:
 
 class PlanState(TypedDict):
     input: str
+    plan_type: str
+    plan_status: str
     plan: list[str]
     output: str
 
