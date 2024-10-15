@@ -72,6 +72,7 @@ Ensure that the code block inside the JSON adheres to the following formatting g
 
 ### NOTE:
 - Generate the tool using the provided template, ensuring all specifications and responsibilities are met.
-- Don't pass api key as a tool parameter.
+- For information retrieval from internet try to use api calls rather than web scraping.
+- Don't mention the api key as a property or parameter in the Pydantic Model or in the function signature.
 - Strictly follow the json response format and tool template for the tool definition.
 - Tool definition (the code block) is error-free.
